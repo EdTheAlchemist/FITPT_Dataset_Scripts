@@ -5,11 +5,9 @@ sys.path.insert(0, './Constants')
 
 ##### MAIN IMPORTS #####
 
-from Paths import PERSONALITY_FILE_PATH, FILTERED_USER_FILE_PATH, PERSONALITY_COOR_FILE_PATH, PERSONALITY_ITEM_SCORES_FILE_PATH, PERSONALITY_CRONBACHS_ALPHA_FILE_PATH
-from StringIO import StringIO
+from Paths import PERSONALITY_FILE_PATH, FILTERED_USER_FILE_PATH, PERSONALITY_COOR_FILE_PATH, PERSONALITY_ITEM_SCORES_FILE_PATH, PERSONALITY_CRONBACHS_ALPHA_FILE_PATH, PERSONALITY_STATS_FILE_PATH, PERSONALITY_BINS_FILE_PATH
 
 import pandas as pd
-import matplotlib.pyplot as plt
 
 ##### CONSTANTS #####
 
@@ -28,6 +26,7 @@ ITEM_TO_TRAIT = {
 	'Neuroticism': [4, 9, 14, 19, 24, 29, 34, 39],
 	'Openness': [5, 10, 15, 20, 25, 30, 35, 40, 41, 44],
 }
+BINS = [x * .25 for x in range(4,21)]
 ##### FUNCTIONS #####
 
 def reverse_score(number):
@@ -54,6 +53,37 @@ filtered_user_df.set_index("UserID", inplace=True)
 
 # Remove / filter out participants who don't qualify / Retain those who do
 personality_df = personality_df[personality_df.index.isin(filtered_user_df.index)]
+
+# Get mean, std, min, and max for each trait and save to CSV file
+stats = []
+for trait in ITEM_TO_TRAIT:
+	trait_df = personality_df[trait]
+	temp_stats = {
+		'trait': trait,
+		'mean': trait_df.mean(),
+		'std': trait_df.std(),
+		'min': trait_df.min(),
+		'max': trait_df.max()
+	}
+	stats.append(temp_stats)
+stats_df = pd.DataFrame(stats)
+stats_df.set_index("trait", inplace=True)
+stats_df.to_csv(PERSONALITY_STATS_FILE_PATH)
+
+# Bin personality traits for graph creation
+binned_scores = []
+for trait in ITEM_TO_TRAIT:
+	key = "binned_%s" % trait
+	personality_df[key] = pd.cut(personality_df[trait], BINS)
+
+	temp_binned_scores = personality_df[key].value_counts().to_dict()
+	temp_binned_scores['trait'] = trait
+
+	binned_scores.append(temp_binned_scores)
+binned_scores_df = pd.DataFrame(binned_scores)
+binned_scores_df.set_index("trait", inplace=True)
+binned_scores_df = binned_scores_df.reindex(sorted(binned_scores_df.columns), axis=1)
+binned_scores_df.to_csv(PERSONALITY_BINS_FILE_PATH)
 
 # Get correlation between each personality trait
 personality_df[[x for x in ITEM_TO_TRAIT]].corr().to_csv(PERSONALITY_COOR_FILE_PATH)
