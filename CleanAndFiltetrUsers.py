@@ -28,11 +28,7 @@ count = 0
 def calculate_age(text):
 	global week, count
 
-	try:
-		born = datetime.strptime(text, "%Y-%m-%d").date()
-	except:
-		print("Exception error with:", texst)
-		born = datetime.strptime(COLLECTION_DATES[week][0], "%d/%m/%Y").date()
+	born = datetime.strptime(text, "%Y-%m-%d").date()
 	day_of_collection = datetime.strptime(COLLECTION_DATES[week][0], "%d/%m/%Y").date()
 	age = day_of_collection.year - born.year - ((day_of_collection.month, day_of_collection.day) < (born.month, born.day))
 
