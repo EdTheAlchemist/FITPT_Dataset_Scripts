@@ -121,3 +121,4 @@ for trait in ITEM_TO_TRAIT:
 
 # Generate DataFrame of alpha coefficients and save to CSV
 pd.DataFrame(alpha_coefs, columns=["Trait", "Cronbach's Alpha"]).to_csv(PERSONALITY_CRONBACHS_ALPHA_FILE_PATH)
+
