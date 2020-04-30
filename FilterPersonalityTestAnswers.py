@@ -54,20 +54,28 @@ filtered_user_df.set_index("UserID", inplace=True)
 # Remove / filter out participants who don't qualify / Retain those who do
 personality_df = personality_df[personality_df.index.isin(filtered_user_df.index)]
 
-# Get mean, std, min, and max for each trait and save to CSV file
+# Get mean, std, min, and max for each trait and for each participant grouping and save to CSV file
+# Groupings refer to: (1) all users, (2) all with twitter, (3) all with instagram, and (4) all with both accounts
+twitter_users_df = filtered_user_df[filtered_user_df['HasTwitter'] == True]
+instagram_users_df = filtered_user_df[filtered_user_df['HasInstagram'] == True]
+both_users_df = filtered_user_df[(filtered_user_df['HasTwitter'] == True) & (filtered_user_df['HasInstagram'] == True)]
+
+dfs = [[filtered_user_df, "all"], [twitter_users_df, "twitter"], [instagram_users_df, "instagram"], [both_users_df, "both"]]
 stats = []
-for trait in ITEM_TO_TRAIT:
-	trait_df = personality_df[trait]
-	temp_stats = {
-		'trait': trait,
-		'mean': trait_df.mean(),
-		'std': trait_df.std(),
-		'min': trait_df.min(),
-		'max': trait_df.max()
-	}
-	stats.append(temp_stats)
-stats_df = pd.DataFrame(stats)
-stats_df.set_index("trait", inplace=True)
+for df in dfs:
+	for trait in ITEM_TO_TRAIT:
+		trait_df = df[0][trait]
+		temp_stats = {
+			'group': df[1],
+			'trait': trait,
+			'mean': trait_df.mean(),
+			'std': trait_df.std(),
+			'min': trait_df.min(),
+			'max': trait_df.max()
+		}
+		stats.append(temp_stats)
+stats_df = pd.DataFrame(stats, columns=["group", "trait", "mean", "std", "min", 'max'])
+stats_df.set_index("group", inplace=True)
 stats_df.to_csv(PERSONALITY_STATS_FILE_PATH)
 
 # Bin personality traits for graph creation
@@ -121,4 +129,11 @@ for trait in ITEM_TO_TRAIT:
 
 # Generate DataFrame of alpha coefficients and save to CSV
 pd.DataFrame(alpha_coefs, columns=["Trait", "Cronbach's Alpha"]).to_csv(PERSONALITY_CRONBACHS_ALPHA_FILE_PATH)
+
+
+
+
+
+
+
 
