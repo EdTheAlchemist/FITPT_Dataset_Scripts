@@ -27,6 +27,7 @@ ITEM_TO_TRAIT = {
 	'Openness': [5, 10, 15, 20, 25, 30, 35, 40, 41, 44],
 }
 BINS = [x * .25 for x in range(4,21)]
+
 ##### FUNCTIONS #####
 
 def reverse_score(number):
@@ -129,11 +130,3 @@ for trait in ITEM_TO_TRAIT:
 
 # Generate DataFrame of alpha coefficients and save to CSV
 pd.DataFrame(alpha_coefs, columns=["Trait", "Cronbach's Alpha"]).to_csv(PERSONALITY_CRONBACHS_ALPHA_FILE_PATH)
-
-
-
-
-
-
-
-

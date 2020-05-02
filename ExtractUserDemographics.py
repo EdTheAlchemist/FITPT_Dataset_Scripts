@@ -9,8 +9,6 @@ from Paths import FILTERED_USER_FILE_PATH, USER_DEMOGRAPHICS_FILE_PATH
 
 import pandas as pd
 
-# [u'Sex', u'Nationality', u'Age', u'HasTwitter', u'HasInstagram', u'Openness', u'Conscientiousness', u'Extraversion', u'Agreeableness', u'Neuroticism']
-
 ##### START OF SCRIPT #####
 
 # Main dictionary to hold all demographics
@@ -98,6 +96,7 @@ demographics.append({
 	'both': len(both_users_df[both_users_df['Nationality'] != 'Filipino']),
 	})
 
+# Convert demographics list to dataframe and save to CSV
 df = pd.DataFrame(demographics)
 df.set_index("group", inplace=True)
 df.to_csv(USER_DEMOGRAPHICS_FILE_PATH)
