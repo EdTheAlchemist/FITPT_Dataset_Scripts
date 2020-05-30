@@ -6,8 +6,10 @@ sys.path.insert(0, './Constants')
 ##### MAIN IMPORTS #####
 
 from Paths import USER_FILE_PATH, TWITTTER_POST_FILE_PATH, INSTA_POST_FILE_PATH, TIME_POSTS_PER_YEAR_FILE_PATH
+from Paths import INSTAGRAM_POSTS_FOLDER_PATH
 
 import pandas as pd
+import os
 
 ##### FUNCTIONS #####
 
@@ -41,12 +43,23 @@ twitter_years_dict['platform'] = "twitter"
 years.append(twitter_years_dict)
 
 ##### Instagram follows similar process above, but with different function (because of different date format)
+# For Instagram postst
 instagram_df = pd.read_csv(INSTA_POST_FILE_PATH)
 instagram_df.set_index("InstaPostID", inplace=True)
 instagram_df = instagram_df[instagram_df['UserID'].isin(users_df.index)]
 instagram_df['DatePosted'] = instagram_df['DatePosted'].apply(extract_year_instagram)
 instagram_years_dict = instagram_df['DatePosted'].value_counts().to_dict()
 instagram_years_dict['platform'] = "instagram"
+years.append(instagram_years_dict)
+# For Instagram images
+image_files = [filename.split("_")[1] for filename in os.listdir(INSTAGRAM_POSTS_FOLDER_PATH) if filename != ".DS_Store"]
+instagram_years_image_dict = instagram_df['DatePosted'][instagram_df.index.isin(image_files)].value_counts().to_dict()
+instagram_years_image_dict['platform'] = "instagram_image"
+years.append(instagram_years_image_dict)
+# For Instagram captions
+instagram_df['DatePosted'] = instagram_df['DatePosted'].apply(extract_year_instagram)
+instagram_years_dict = instagram_df['DatePosted'][~instagram_df['Caption'].isnull()].value_counts().to_dict()
+instagram_years_dict['platform'] = "instagram_caption"
 years.append(instagram_years_dict)
 
 # Convert list of posts per year to dataframe and save to CSV file
